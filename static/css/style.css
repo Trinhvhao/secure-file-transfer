@@ -1,0 +1,25 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container {
+    max-width: 800px;
+}
+
+h1 {
+    color: #007bff;
+}
+
+.btn-success, .btn-info {
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.list-group-item {
+    font-size: 14px;
+}
+
+.progress {
+    height: 20px;
+}
