@@ -1,14 +1,14 @@
 import base64
 import json
+import os
 import socket
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 from core.utils import *
 
 HOST = '127.0.0.1'
 PORT = 65432
-DATA_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transfer\data"
+DATA_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transferr\data"
 print(f"DATA_DIR in receiver_local.py: {DATA_DIR}")
 
 
@@ -68,7 +68,7 @@ def receiver_local():
                         conn.close()
                         break
                     received_data += chunk
-                print("Received packet")
+                print("Received encrypted packet")
 
                 try:
                     packet = json.loads(received_data.decode())
@@ -78,32 +78,29 @@ def receiver_local():
                     conn.close()
                     continue
 
+                # Lấy dữ liệu từ gói tin
                 iv = base64.b64decode(packet['iv'])
                 ciphertext = base64.b64decode(packet['cipher'])
                 hash_value = base64.b64decode(packet['hash'])
                 signature = base64.b64decode(packet['sig'])
                 mac = base64.b64decode(packet['mac'])
+                encrypted_session_key = base64.b64decode(packet['encrypted_session_key'])
                 encrypted_hmac_key = base64.b64decode(packet['hmac_key'])
                 expiration = packet['exp']
-                encrypted_session_key = base64.b64decode(packet['encrypted_session_key'])
                 file_name = packet.get('file_name', 'email.txt')
-                receiver_username = packet.get('receiver_username', 'unknown')  # Lấy receiver_username từ packet
+                receiver_username = packet.get('receiver_username', 'unknown')
 
+                # Kiểm tra thời hạn
                 current_time = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
                 if current_time > expiration:
+                    print(f"Timeout: Current time {current_time} > Expiration {expiration}")
                     conn.sendall(b"NACK: Timeout")
                     conn.close()
                     continue
 
-                # Cập nhật metadata để handle format mới (backward compatible)
-                metadata_parts = [file_name]
-                if receiver_username != 'unknown':
-                    metadata_parts.append(receiver_username)
-                metadata_parts.append(expiration)
-                metadata = "|".join(metadata_parts).encode()
-
+                # Xây dựng metadata để kiểm tra chữ ký
+                metadata = f"{file_name}|{receiver_username}|{expiration}".encode()
                 print(f"Verifying metadata: {metadata.decode()}")
-                print(f"Received signature: {base64.b64encode(signature).decode()}")
                 if not verify_signature(metadata, signature, load_public_key('sender_public.pem')):
                     print("Signature verification failed")
                     conn.sendall(b"NACK: Invalid signature")
@@ -111,35 +108,40 @@ def receiver_local():
                     continue
                 print("Signature verified successfully")
 
+                # Kiểm tra tính toàn vẹn với SHA-512
                 hash_input = iv + ciphertext + expiration.encode()
                 if calculate_hash(hash_input) != hash_value:
                     print("Integrity check failed")
                     conn.sendall(b"NACK: Integrity check failed")
                     conn.close()
                     continue
+                print("Hash verified successfully")
 
+                # Giải mã khóa session
                 session_key = decrypt_session_key(encrypted_session_key, private_key)
+                print("Session key decrypted successfully")
+
+                # Giải mã khóa HMAC (tùy chọn)
                 hmac_key = decrypt_session_key(encrypted_hmac_key, private_key)
-                if not verify_hmac(iv + ciphertext + expiration.encode(), mac, hmac_key):
-                    print("MAC verification failed")
-                    conn.sendall(b"NACK: Invalid MAC")
+                if not verify_hmac(hash_input, mac, hmac_key):
+                    print("HMAC verification failed")
+                    conn.sendall(b"NACK: Invalid HMAC")
                     conn.close()
                     continue
-                print("MAC verified successfully")
+                print("HMAC verified successfully")
 
+                # Giải mã file
                 decrypted_data = aes_decrypt(iv, ciphertext, session_key)
+                print(f"File decrypted with AES-CBC, size: {len(decrypted_data)} bytes")
 
-                # Thêm receiver_username vào tên file để phân biệt
-                if receiver_username != 'unknown':
-                    received_file_path = os.path.join(DATA_DIR, f'received_{receiver_username}_{file_name}')
-                else:
-                    received_file_path = os.path.join(DATA_DIR, f'received_{file_name}')
-
-                print(f"Saving received file to: {received_file_path}")
+                # Lưu file đã giải mã
+                received_file_path = os.path.join(DATA_DIR, f"received_{receiver_username}_{file_name}")
+                print(f"Saving decrypted file to: {received_file_path}")
                 with open(received_file_path, 'wb') as f:
                     f.write(decrypted_data)
-                print(f"File received and saved for user: {receiver_username}")
+                print(f"Decrypted file saved for user: {receiver_username}")
 
+                # Gửi ACK
                 conn.sendall(b"ACK")
                 print("Sent ACK")
                 conn.close()

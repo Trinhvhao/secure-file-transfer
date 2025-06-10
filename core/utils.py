@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-DATA_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transfer\data"
+DATA_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transferr\data"
 os.makedirs(DATA_DIR, exist_ok=True)
 print(f"DATA_DIR in utils.py: {DATA_DIR}")
 

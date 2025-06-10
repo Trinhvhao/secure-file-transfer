@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure File Transfer</title>
+    <title>Chuyển File An Toàn</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
@@ -225,58 +225,106 @@
         #option2:not(:checked) + label[for="option2"] {
             color: #7d7d7d;
         }
+        .receive-form {
+            display: none;
+            width: 400px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .receive-form.active {
+            display: block;
+        }
+        .receive-form .form-group {
+            margin-bottom: 15px;
+        }
+        .receive-form .form-control {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px;
+            width: 100%;
+        }
+        .receive-form .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .receive-form .btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="content">
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">transfernow</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand" href="#">TransferNow</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#">Discover</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Offers and prices</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Apps</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Developers</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Resources</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Khám phá</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Ưu đãi và giá cả</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Ứng dụng</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Nhà phát triển</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Tài nguyên</a></li>
                     </ul>
-                    <div class="d-flex">
+                    <div class="d-flex align-center" style="align-items: center">
                         {% if not username %}
-                            <button class="btn btn-primary sign-in" onclick="window.location.href='/login'">Sign in</button>
-                            <button class="btn btn-outline-light" onclick="window.location.href='/register'">Sign up</button>
+                            <button class="btn btn-primary sign-in" onclick="window.location.href='/login'">Đăng nhập</button>
+                            <button class="btn btn-outline-light" onclick="window.location.href='/register'">Đăng ký</button>
                         {% else %}
-                            <span class="nav-link text-white">Welcome, {{ username }}!</span>
-                            <button class="btn btn-outline-light" onclick="window.location.href='/logout'">Logout</button>
+                            <span class="nav-link text-white">Chào mừng, {{ username }}!</span>
+                            <button class="btn btn-outline-light" onclick="window.location.href='/logout'">Đăng xuất</button>
                         {% endif %}
                     </div>
                 </div>
             </div>
         </nav>
         <div class="main-section">
-            <h1>Transfer and have your files travel for free</h1>
-            <p>TransferNow is a simple and free way to securely share your files and folders.</p>
+            <h1>Chuyển và để file của bạn du hành miễn phí</h1>
+            <p>TransferNow là cách đơn giản và miễn phí để chia sẻ file và thư mục một cách an toàn.</p>
             <div class="start-button">
                 <i class="fas fa-cloud cloud-icon"></i>
             </div>
             <div class="drop-zone" id="dropZone">
-                <p>Click or drag-and-drop your files here</p>
-                <div class="or">OR</div>
-                <button>Browse files</button>
+                <p>Nhấp hoặc kéo thả file vào đây</p>
+                <div class="or">HOẶC</div>
+                <button>Duyệt file</button>
+            </div>
+            <div class="receive-form" id="receiveForm">
+                <div class="form-group">
+                    <input type="email" class="form-control" id="receiverEmail" placeholder="Địa chỉ email của bạn" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="receiverUsername" placeholder="Tên đăng nhập của bạn" readonly value="{{ username }}" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="senderUsernameReceive" placeholder="Tên đăng nhập người gửi" required>
+                </div>
+                <button class="btn" id="fetchFilesButton">Lấy file</button>
+                <div class="received-files" id="receivedFiles">
+                    <!-- Danh sách file đã nhận sẽ được điền động -->
+                </div>
             </div>
             <div class="stats">
-                <span>2,250,831,405 downloaded files</span>
-                <span>752,358,181 sent files</span>
-                <span>66,906,515 GB sent into orbit</span>
-                <span>4.8 ★★★★★ (635,122 votes)</span>
+                <span>2,250,831,405 file đã tải xuống</span>
+                <span>752,358,181 file đã gửi</span>
+                <span>66,906,515 GB đã được gửi vào quỹ đạo</span>
+                <span>4.8 ★★★★★ (635,122 lượt bình chọn)</span>
             </div>
             <div id="firstFilter" class="filter-switch">
                 <input checked="" id="option1" name="options" type="radio" />
-                <label class="option" for="option1">Send</label>
+                <label class="option" for="option1">Gửi</label>
                 <input id="option2" name="options" type="radio" />
-                <label class="option" for="option2">Receive</label>
+                <label class="option" for="option2">Nhận</label>
                 <span class="background"></span>
             </div>
         </div>
@@ -287,290 +335,252 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="sendModalLabel">Send files</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="sendModalLabel">Gửi file</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="senderEmail" class="form-label">Your email address</label>
+                        <label for="senderEmail" class="form-label">Địa chỉ email của bạn</label>
                         <input type="email" class="form-control" id="senderEmail" placeholder="your.email@example.com" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="senderUsername" class="form-label">Your username</label>
-                        <input type="text" class="form-control" id="senderUsername" placeholder="Your username" readonly>
+                        <label for="senderUsername" class="form-label">Tên đăng nhập của bạn</label>
+                        <input type="text" class="form-control" id="senderUsername" placeholder="Tên đăng nhập" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="recipientUsername" class="form-label">Recipient username</label>
+                        <label for="recipientUsername" class="form-label">Tên đăng nhập người nhận</label>
                         <input type="text" class="form-control" id="recipientUsername" placeholder="recipient_username" list="userList">
                         <datalist id="userList">
-                            <!-- User list will be populated dynamically -->
+                            <!-- Danh sách người dùng sẽ được điền động -->
                         </datalist>
                     </div>
                     <div class="mb-3">
-                        <label for="subject" class="form-label">Subject (optional)</label>
-                        <input type="text" class="form-control" id="subject" placeholder="Subject">
+                        <label for="subject" class="form-label">Tiêu đề (tùy chọn)</label>
+                        <input type="text" class="form-control" id="subject" placeholder="Tiêu đề">
                     </div>
                     <div class="mb-3">
-                        <label for="message" class="form-label">Your message (optional)</label>
-                        <textarea class="form-control" id="message" rows="3" placeholder="Add a message"></textarea>
+                        <label for="message" class="form-label">Tin nhắn của bạn (tùy chọn)</label>
+                        <textarea class="form-control" id="message" rows="3" placeholder="Thêm tin nhắn"></textarea>
                     </div>
                     <div class="file-list" id="fileList">
-                        <!-- File list will be populated here -->
+                        <!-- Danh sách file sẽ được điền động -->
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id="transferButton">Transfer</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-primary" id="transferButton">Chuyển</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Receive Modal -->
-    <div class="modal fade" id="receiveModal" tabindex="-1" aria-labelledby="receiveModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="receiveModalLabel">Receive files</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="receiverEmail" class="form-label">Your email address</label>
-                        <input type="email" class="form-control" id="receiverEmail" placeholder="your.email@example.com">
-                    </div>
-                    <div class="mb-3">
-                        <label for="receiverUsername" class="form-label">Your username</label>
-                        <input type="text" class="form-control" id="receiverUsername" placeholder="Your username" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="senderUsernameReceive" class="form-label">Sender username</label>
-                        <input type="text" class="form-control" id="senderUsernameReceive" placeholder="sender_username">
-                    </div>
-                    <button type="button" class="btn btn-primary" id="fetchFilesButton">Fetch Files</button>
-                    <div class="received-files" id="receivedFiles">
-                        <!-- Received files will be populated here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Bootstrap JS and Popper.js -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dropZone = document.getElementById('dropZone');
-            const fileList = document.getElementById('fileList');
-            const sendModal = new bootstrap.Modal(document.getElementById('sendModal'));
-            const receiveModal = new bootstrap.Modal(document.getElementById('receiveModal'));
-            const senderEmail = document.getElementById('senderEmail');
-            const senderUsername = document.getElementById('senderUsername');
-            const recipientUsername = document.getElementById('recipientUsername');
-            const userList = document.getElementById('userList');
-            const receiverEmail = document.getElementById('receiverEmail');
-            const receiverUsername = document.getElementById('receiverUsername');
-            const senderUsernameReceive = document.getElementById('senderUsernameReceive');
-            const receivedFiles = document.getElementById('receivedFiles');
-            let selectedFiles = [];
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dropZone = document.getElementById('dropZone');
+        const startButton = document.querySelector('.start-button');
+        const receiveForm = document.getElementById('receiveForm');
+        const fileList = document.getElementById('fileList');
+        const sendModal = new bootstrap.Modal(document.getElementById('sendModal'));
+        const senderEmail = document.getElementById('senderEmail');
+        const senderUsername = document.getElementById('senderUsername');
+        const recipientUsername = document.getElementById('recipientUsername');
+        const userList = document.getElementById('userList');
+        const receiverEmail = document.getElementById('receiverEmail');
+        const receiverUsernameForm = document.getElementById('receiverUsername');
+        const senderUsernameReceive = document.getElementById('senderUsernameReceive');
+        const receivedFiles = document.getElementById('receivedFiles');
+        let selectedFiles = [];
 
-            // Check login status with server validation
-            async function checkLogin() {
-                const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-                if (!token) return false;
+        // Kiểm tra trạng thái đăng nhập với xác thực từ server
+        async function checkLogin() {
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
+            if (!token) return false;
 
+            try {
+                const response = await fetch('/get_sender_info', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                return response.ok; // True nếu trạng thái là 200
+            } catch (error) {
+                console.error('Kiểm tra đăng nhập thất bại:', error);
+                return false;
+            }
+        }
+
+        // Cài đặt modal gửi
+        sendModal._element.addEventListener('show.bs.modal', async () => {
+            if (!(await checkLogin())) {
+                alert('Vui lòng đăng nhập lại.');
+                window.location.href = '/login';
+                sendModal.hide();
+                return;
+            }
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
+            if (token) {
                 try {
                     const response = await fetch('/get_sender_info', {
                         method: 'GET',
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
-                    return response.ok; // True if status is 200
+                    if (response.ok) {
+                        const data = await response.json();
+                        senderEmail.value = data.email || '';
+                        senderUsername.value = data.username || '';
+                        userList.innerHTML = (data.users || []).map(user => `<option value="${user}">`).join('');
+                    } else {
+                        alert('Không thể tải thông tin người gửi. Vui lòng đăng nhập lại.');
+                        window.location.href = '/login';
+                    }
                 } catch (error) {
-                    console.error('Login check failed:', error);
-                    return false;
+                    console.error('Lỗi khi lấy thông tin người gửi:', error);
+                    alert('Lỗi mạng. Vui lòng thử lại.');
                 }
             }
+        });
 
-            // Send modal setup
-            sendModal._element.addEventListener('show.bs.modal', async () => {
-                if (!(await checkLogin())) {
-                    alert('Vui lòng đăng nhập lại.');
-                    window.location.href = '/login';
-                    sendModal.hide();
-                    return;
-                }
-                const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-                if (token) {
-                    try {
-                        const response = await fetch('/get_sender_info', {
-                            method: 'GET',
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            senderEmail.value = data.email || '';
-                            senderUsername.value = data.username || '';
-                            userList.innerHTML = (data.users || []).map(user => `<option value="${user}">`).join('');
-                        } else {
-                            alert('Không thể tải thông tin người gửi. Vui lòng đăng nhập lại.');
-                            window.location.href = '/login';
-                        }
-                    } catch (error) {
-                        console.error('Error fetching sender info:', error);
-                        alert('Lỗi mạng. Vui lòng thử lại.');
-                    }
-                }
-            });
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
 
-            // Receive modal setup
-            receiveModal._element.addEventListener('show.bs.modal', async () => {
-                if (!(await checkLogin())) {
-                    alert('Vui lòng đăng nhập lại.');
-                    window.location.href = '/login';
-                    receiveModal.hide();
-                    return;
-                }
-                receiverUsername.value = "{{ username }}" || '';
-                receivedFiles.innerHTML = '';
-            });
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
 
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('dragover');
-            });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            selectedFiles = Array.from(e.dataTransfer.files);
+            updateFileList();
+            if (document.getElementById('option1').checked) {
+                sendModal.show();
+            }
+        });
 
-            dropZone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-            });
-
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('dragover');
-                selectedFiles = Array.from(e.dataTransfer.files);
+        dropZone.querySelector('button').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = '.txt';
+            input.onchange = (e) => {
+                selectedFiles = Array.from(e.target.files);
                 updateFileList();
                 if (document.getElementById('option1').checked) {
                     sendModal.show();
                 }
-            });
+            };
+            input.click();
+        });
 
-            dropZone.querySelector('button').addEventListener('click', () => {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.multiple = true;
-                input.accept = '.txt';
-                input.onchange = (e) => {
-                    selectedFiles = Array.from(e.target.files);
-                    updateFileList();
-                    if (document.getElementById('option1').checked) {
-                        sendModal.show();
+        function updateFileList() {
+            fileList.innerHTML = '<h6>Danh sách file:</h6>' + selectedFiles.map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>`).join('');
+        }
+
+        document.getElementById('transferButton').addEventListener('click', async () => {
+            if (!(await checkLogin())) {
+                alert('Vui lòng đăng nhập lại.');
+                window.location.href = '/login';
+                return;
+            }
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
+            if (token && selectedFiles.length > 0 && recipientUsername.value) {
+                const formData = new FormData();
+                selectedFiles.forEach(file => formData.append('files', file));
+                formData.append('mode', 'Local');
+                formData.append('action', 'send');
+                formData.append('receiver_username', recipientUsername.value);
+                formData.append('sender_email', senderEmail.value);
+                formData.append('sender_username', senderUsername.value);
+                formData.append('subject', document.getElementById('subject').value);
+                formData.append('message', document.getElementById('message').value);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/transfer', true);
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        alert('Chuyển file thành công!');
+                        sendModal.hide();
+                        selectedFiles = [];
+                        fileList.innerHTML = '';
+                    } else if (xhr.status === 401) {
+                        alert('Vui lòng đăng nhập lại.');
+                        window.location.href = '/login';
+                    } else {
+                        alert('Đã xảy ra lỗi: ' + xhr.responseText);
                     }
                 };
-                input.click();
-            });
-
-            function updateFileList() {
-                fileList.innerHTML = '<h6>Files:</h6>' + selectedFiles.map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>`).join('');
+                xhr.onerror = () => {
+                    alert('Lỗi mạng. Vui lòng thử lại.');
+                };
+                xhr.send(formData);
+            } else {
+                alert('Vui lòng chọn file và cung cấp tên người nhận.');
             }
-
-            document.getElementById('transferButton').addEventListener('click', async () => {
-                if (!(await checkLogin())) {
-                    alert('Vui lòng đăng nhập lại.');
-                    window.location.href = '/login';
-                    return;
-                }
-                const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-                if (token && selectedFiles.length > 0 && recipientUsername.value) {
-                    const formData = new FormData();
-                    selectedFiles.forEach(file => formData.append('files', file));
-                    formData.append('mode', 'Local');
-                    formData.append('action', 'send');
-                    formData.append('receiver_username', recipientUsername.value);
-                    formData.append('sender_email', senderEmail.value);
-                    formData.append('sender_username', senderUsername.value);
-                    formData.append('subject', document.getElementById('subject').value);
-                    formData.append('message', document.getElementById('message').value);
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/transfer', true);
-                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-                    xhr.onload = () => {
-                        if (xhr.status === 200) {
-                            alert('Chuyển file thành công!');
-                            sendModal.hide();
-                            selectedFiles = [];
-                            fileList.innerHTML = '';
-                        } else if (xhr.status === 401) {
-                            alert('Vui lòng đăng nhập lại.');
-                            window.location.href = '/login';
-                        } else {
-                            alert('Đã xảy ra lỗi: ' + xhr.responseText);
-                        }
-                    };
-                    xhr.onerror = () => {
-                        alert('Lỗi mạng. Vui lòng thử lại.');
-                    };
-                    xhr.send(formData);
-                } else {
-                    alert('Vui lòng chọn file và cung cấp tên người nhận.');
-                }
-            });
-
-            // Fetch received files
-            document.getElementById('fetchFilesButton').addEventListener('click', async () => {
-                if (!(await checkLogin())) {
-                    alert('Vui lòng đăng nhập lại.');
-                    window.location.href = '/login';
-                    return;
-                }
-                const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-
-                if (receiverEmail.value && receiverUsername.value && senderUsernameReceive.value) {
-                    try {
-                        const response = await fetch('/get_received_files', {
-                            method: 'POST',
-                            headers: {
-                                'Authorization': `Bearer ${token}`,
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                receiver_email: receiverEmail.value,
-                                receiver_username: receiverUsername.value,
-                                sender_username: senderUsernameReceive.value
-                            })
-                        });
-                        if (response.ok) {
-                            const data = await response.json();
-                            receivedFiles.innerHTML = '<h6>Received Files:</h6>' + (data.files || []).map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB) - Sent at: ${file.sent_at}</p>`).join('');
-                        } else if (response.status === 401) {
-                            alert('Phiên làm việc hết hạn. Vui lòng đăng nhập lại.');
-                            window.location.href = '/login';
-                        } else {
-                            alert('Lỗi khi lấy file: ' + await response.text());
-                        }
-                    } catch (error) {
-                        console.error('Error fetching files:', error);
-                        alert('Lỗi mạng. Vui lòng thử lại.');
-                    }
-                } else {
-                    alert('Vui lòng điền đầy đủ các trường.');
-                }
-            });
-
-            // Toggle modals based on switch
-            document.getElementById('option1').addEventListener('change', () => {
-                if (selectedFiles.length > 0) {
-                    sendModal.show();
-                }
-            });
-
-            document.getElementById('option2').addEventListener('change', () => {
-                receiveModal.show();
-            });
         });
-    </script>
+
+        // Lấy file đã nhận
+        document.getElementById('fetchFilesButton').addEventListener('click', async () => {
+            if (!(await checkLogin())) {
+                alert('Vui lòng đăng nhập lại.');
+                window.location.href = '/login';
+                return;
+            }
+            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
+
+            if (receiverEmail.value && receiverUsernameForm.value && senderUsernameReceive.value) {
+                try {
+                    const response = await fetch('/get_received_files', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            receiver_email: receiverEmail.value,
+                            receiver_username: receiverUsernameForm.value,
+                            sender_username: senderUsernameReceive.value
+                        })
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        receivedFiles.innerHTML = '<h6>File đã nhận:</h6>' + (data.files || []).map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB) - Gửi lúc: ${file.sent_at} <a href="/download?file=${encodeURIComponent(file.path)}" class="btn btn-sm btn-primary" download="${file.name}">Tải về</a></p>`).join('');
+                    } else if (response.status === 401) {
+                        alert('Phiên làm việc hết hạn. Vui lòng đăng nhập lại.');
+                        window.location.href = '/login';
+                    } else {
+                        alert('Lỗi khi lấy file: ' + await response.text());
+                    }
+                } catch (error) {
+                    console.error('Lỗi khi lấy file:', error);
+                    alert('Lỗi mạng. Vui lòng thử lại.');
+                }
+            } else {
+                alert('Vui lòng điền đầy đủ các trường.');
+            }
+        });
+
+        // Chuyển đổi nội dung dựa trên bộ lọc
+        document.getElementById('option1').addEventListener('change', () => {
+            startButton.style.display = 'flex';
+            dropZone.style.display = 'flex';
+            receiveForm.classList.remove('active');
+            if (selectedFiles.length > 0) {
+                sendModal.show();
+            }
+        });
+
+        document.getElementById('option2').addEventListener('change', () => {
+            startButton.style.display = 'none';
+            dropZone.style.display = 'none';
+            receiveForm.classList.add('active');
+        });
+    });
+</script>
 </body>
 </html>
