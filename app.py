@@ -20,7 +20,7 @@ from core.local.sender_local import sender_local
 from core.local.receiver_local import receiver_local
 
 app = Flask(__name__)
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transferr"
 instance_dir = os.path.join(BASE_DIR, 'instance')
 os.makedirs(instance_dir, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(instance_dir, "secure_file_transferr.db")}'
@@ -270,7 +270,6 @@ def transfer_file():
                     status_log.append(f"Error: Failed to save file at {file_path}")
                     continue
                 status_log.append(f"File {file.filename} saved successfully at {file_path}")
-                # Kiểm tra lại file trước khi gửi
                 if os.path.exists(file_path):
                     status_log.append(f"File {file.filename} exists, sending to {receiver_username}")
                     if mode == "Local":
@@ -312,5 +311,5 @@ def transfer_file():
 
 if __name__ == "__main__":
     with app.app_context():
-        db.create_all()  # Tạo bảng nếu chưa tồn tại
-    app.run(host="0.0.0.0", port=8000, debug=True)
+        db.create_all()
+    app.run(host="0.0.0.0", port=8000, debug=True)  # Chạy trên tất cả giao diện mạng

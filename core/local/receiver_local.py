@@ -6,11 +6,12 @@ from datetime import datetime, timezone
 
 from core.utils import *
 
-HOST = '127.0.0.1'
-PORT = 65432
-DATA_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transferr\data"
+BASE_DIR = r"C:\Users\Admin\PycharmProjects\secure_file_transferr"
+DATA_DIR = os.path.join(BASE_DIR, "data")
 print(f"DATA_DIR in receiver_local.py: {DATA_DIR}")
 
+HOST = '0.0.0.0'  # Lắng nghe tất cả kết nối từ mạng
+PORT = 65432
 
 def receiver_local():
     print("Starting receiver on {}:{}".format(HOST, PORT))
@@ -19,10 +20,10 @@ def receiver_local():
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        s.settimeout(60)  # Tăng timeout lên 60 giây
+        s.settimeout(60)
         s.bind((HOST, PORT))
-        s.listen(5)  # Cho phép 5 kết nối chờ
-        print("Listening for connections...")
+        s.listen(5)
+        print("Listening for connections from any machine on the network...")
         while True:
             try:
                 conn, addr = s.accept()
@@ -78,7 +79,6 @@ def receiver_local():
                     conn.close()
                     continue
 
-                # Lấy dữ liệu từ gói tin
                 iv = base64.b64decode(packet['iv'])
                 ciphertext = base64.b64decode(packet['cipher'])
                 hash_value = base64.b64decode(packet['hash'])
@@ -90,7 +90,6 @@ def receiver_local():
                 file_name = packet.get('file_name', 'email.txt')
                 receiver_username = packet.get('receiver_username', 'unknown')
 
-                # Kiểm tra thời hạn
                 current_time = datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')
                 if current_time > expiration:
                     print(f"Timeout: Current time {current_time} > Expiration {expiration}")
@@ -98,7 +97,6 @@ def receiver_local():
                     conn.close()
                     continue
 
-                # Xây dựng metadata để kiểm tra chữ ký
                 metadata = f"{file_name}|{receiver_username}|{expiration}".encode()
                 print(f"Verifying metadata: {metadata.decode()}")
                 if not verify_signature(metadata, signature, load_public_key('sender_public.pem')):
@@ -108,7 +106,6 @@ def receiver_local():
                     continue
                 print("Signature verified successfully")
 
-                # Kiểm tra tính toàn vẹn với SHA-512
                 hash_input = iv + ciphertext + expiration.encode()
                 if calculate_hash(hash_input) != hash_value:
                     print("Integrity check failed")
@@ -117,11 +114,9 @@ def receiver_local():
                     continue
                 print("Hash verified successfully")
 
-                # Giải mã khóa session
                 session_key = decrypt_session_key(encrypted_session_key, private_key)
                 print("Session key decrypted successfully")
 
-                # Giải mã khóa HMAC (tùy chọn)
                 hmac_key = decrypt_session_key(encrypted_hmac_key, private_key)
                 if not verify_hmac(hash_input, mac, hmac_key):
                     print("HMAC verification failed")
@@ -130,18 +125,15 @@ def receiver_local():
                     continue
                 print("HMAC verified successfully")
 
-                # Giải mã file
                 decrypted_data = aes_decrypt(iv, ciphertext, session_key)
                 print(f"File decrypted with AES-CBC, size: {len(decrypted_data)} bytes")
 
-                # Lưu file đã giải mã
                 received_file_path = os.path.join(DATA_DIR, f"received_{receiver_username}_{file_name}")
                 print(f"Saving decrypted file to: {received_file_path}")
                 with open(received_file_path, 'wb') as f:
                     f.write(decrypted_data)
                 print(f"Decrypted file saved for user: {receiver_username}")
 
-                # Gửi ACK
                 conn.sendall(b"ACK")
                 print("Sent ACK")
                 conn.close()
