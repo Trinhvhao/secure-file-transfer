@@ -5,54 +5,117 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); width: 300px; }
-        h1 { text-align: center; color: #007bff; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; color: #333; }
-        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        .message { text-align: center; color: #28a745; margin-bottom: 15px; }
-        .error { text-align: center; color: #dc3545; margin-bottom: 15px; }
-        a { color: #007bff; text-decoration: none; }
-        a:hover { text-decoration: underline; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+
+        .error {
+            text-align: center;
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>{% if is_register %}Register{% else %}Login{% endif %}</h1>
-        {% if message %}
-            {% if "successful" in message or "registered" in message %}
-                <div class="message">{{ message }}</div>
-            {% else %}
-                <div class="error">{{ message }}</div>
-            {% endif %}
+<div class="container">
+    <h1>{% if is_register %}Register{% else %}Login{% endif %}</h1>
+    {% if message %}
+        {% if "successful" in message or "registered" in message %}
+            <div class="message">{{ message }}</div>
+        {% else %}
+            <div class="error">{{ message }}</div>
         {% endif %}
-        <form action="{% if is_register %}/register{% else %}/login{% endif %}" method="post">
+    {% endif %}
+    <form action="{% if is_register %}/register{% else %}/login{% endif %}" method="post">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        {% if is_register %}
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <label for="email">Email (Optional)</label>
+                <input type="email" id="email" name="email">
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            {% if is_register %}
-                <div class="form-group">
-                    <label for="email">Email (Optional)</label>
-                    <input type="email" id="email" name="email">
-                </div>
-            {% endif %}
-            <button type="submit">{% if is_register %}Register{% else %}Login{% endif %}</button>
-        </form>
-        <p style="text-align: center; margin-top: 10px;">
-            {% if is_register %}
-                Already have an account? <a href="/login">Login</a>
-            {% else %}
-                Don't have an account? <a href="/register">Register</a>
-            {% endif %}
-        </p>
-    </div>
+        {% endif %}
+        <button type="submit">{% if is_register %}Register{% else %}Login{% endif %}</button>
+    </form>
+    <p style="text-align: center; margin-top: 10px;">
+        {% if is_register %}
+            Already have an account? <a href="/login">Login</a>
+        {% else %}
+            Don't have an account? <a href="/register">Register</a>
+        {% endif %}
+    </p>
+</div>
 </body>
 </html>

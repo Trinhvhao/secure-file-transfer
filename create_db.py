@@ -1,91 +1,86 @@
+import logging
 import os
-import sqlite3
-from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+
 from passlib.context import CryptContext
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, scoped_session
 
-# Cấu hình tạm thời cho SQLAlchemy
-db = SQLAlchemy()
+# Cấu hình logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Cấu hình mã hóa mật khẩu
+# Cấu hình SQLAlchemy và mã hóa mật khẩu
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+instance_dir = os.path.join(BASE_DIR, 'instance')
+os.makedirs(instance_dir, exist_ok=True)
+db_path = os.path.join(instance_dir, 'secure_file_transferr.db')
+db_uri = f'sqlite:///{db_path}'
+engine = create_engine(db_uri, echo=False)
+Session = scoped_session(sessionmaker(bind=engine))
+Base = declarative_base()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Mô hình người dùng
-class User(db.Model):
-    __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    username = db.Column(db.String, unique=True, index=True)
-    hashed_password = db.Column(db.String)
-    email = db.Column(db.String, unique=True, index=True, nullable=True)
 
-# Mô hình lịch sử giao dịch
-class TransferLog(db.Model):
+# Mô hình User
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    email = Column(String, unique=True, index=True, nullable=True)
+
+
+# Mô hình TransferLog
+class TransferLog(Base):
     __tablename__ = "transfer_logs"
-    id = db.Column(db.Integer, primary_key=True, index=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
-    receiver_id = db.Column(db.Integer, db.ForeignKey("users.id"), index=True)
-    file_name = db.Column(db.String)
-    timestamp = db.Column(db.DateTime)
-    status = db.Column(db.String)
-    subject = db.Column(db.String, nullable=True)
-    message = db.Column(db.String, nullable=True)
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), index=True)
+    receiver_id = Column(Integer, ForeignKey("users.id"), index=True)
+    file_name = Column(String)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    status = Column(String)
+    subject = Column(String, nullable=True)
+    message = Column(String, nullable=True)
+    cloud_link = Column(String, nullable=True)
+    file_id = Column(String, nullable=True)
+
 
 def initialize_database():
-    # Lấy đường dẫn tuyệt đối tới thư mục instance của dự án
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    instance_dir = os.path.join(base_dir, 'instance')
-    os.makedirs(instance_dir, exist_ok=True)  # Tạo thư mục instance nếu chưa tồn tại
-    db_path = os.path.join(instance_dir, 'secure_file_transferr.db')
-
-    # Xóa file database cũ nếu tồn tại
+    # Xóa database cũ nếu có
     if os.path.exists(db_path):
-        os.remove(db_path)
-        print(f"Deleted existing database: {db_path}")
-
-    # Tạo kết nối và tạo bảng mới
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+        try:
+            os.remove(db_path)
+            logger.info(f"Deleted existing database: {db_path}")
+        except Exception as e:
+            logger.error(f"Error deleting database: {str(e)}")
+            return False
 
     try:
-        # Tạo bảng users
-        cursor.execute('''
-            CREATE TABLE users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                hashed_password TEXT NOT NULL,
-                email TEXT UNIQUE
-            )
-        ''')
-        print("Created table 'users'")
+        Base.metadata.create_all(engine)
+        logger.info("Created tables: 'users' and 'transfer_logs'")
 
-        # Tạo bảng transfer_logs
-        cursor.execute('''
-            CREATE TABLE transfer_logs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                sender_id INTEGER,
-                receiver_id INTEGER,
-                file_name TEXT,
-                timestamp TEXT,
-                status TEXT,
-                subject TEXT,
-                message TEXT,
-                FOREIGN KEY (sender_id) REFERENCES users(id),
-                FOREIGN KEY (receiver_id) REFERENCES users(id)
-            )
-        ''')
-        print("Created table 'transfer_logs'")
+        session = Session()
 
-        # Thêm dữ liệu mẫu
-        cursor.execute("INSERT INTO users (username, hashed_password, email) VALUES (?, ?, ?)",
-                       ("user1", pwd_context.hash("pass123"), "user1@example.com"))
-        conn.commit()
-        print("Added sample user: user1")
+        # Thêm user mẫu
+        sample_user = User(
+            username="user1",
+            hashed_password=pwd_context.hash("pass123"),
+            email="user1@example.com"
+        )
+        session.add(sample_user)
+        session.commit()
+        session.close()
+        logger.info("Added sample user: user1")
+        return True
+    except Exception as e:
+        logger.error(f"Error initializing database: {str(e)}")
+        return False
 
-    except sqlite3.Error as e:
-        print(f"Error creating database: {e}")
-        conn.rollback()
-    finally:
-        conn.close()
 
 if __name__ == "__main__":
-    initialize_database()
-    print("Database initialization completed. You can now run the application.")
+    if initialize_database():
+        logger.info("Database initialization completed successfully.")
+    else:
+        logger.error("Database initialization failed.")

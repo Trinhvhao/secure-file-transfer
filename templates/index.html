@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chuyển File An Toàn</title>
+    <title>Chuyển File An Toàn - TransferNow</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Anime.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
@@ -19,9 +21,9 @@
             overflow: auto;
             color: #333;
             position: relative;
-            background: url('https://assets.transfernow.net/29143843/backgrounds/webp/transfernow_uploader_send_files_laptop_1.webp') no-repeat center center fixed;
-            background-size: cover;
+            transition: background-image 0.5s ease-in-out;
         }
+
         .content {
             position: relative;
             z-index: 1;
@@ -29,34 +31,55 @@
             display: flex;
             flex-direction: column;
         }
-        .navbar {
-            background: transparent;
+
+        .send-mode {
+            background: url('https://assets.transfernow.net/29143843/backgrounds/webp/transfernow_uploader_send_files_laptop_1.webp') no-repeat center center fixed;
+            background-size: cover;
         }
+
+        .receive-mode {
+            background: url('https://assets.transfernow.net/29173515/backgrounds/webp/transfernow_request_files_ltablet.webp') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+        }
+
         .navbar .navbar-brand {
             color: #fff;
             font-weight: 700;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
+
         .navbar .nav-link {
             color: #fff !important;
             margin-left: 15px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
         }
+
         .navbar .btn {
             margin-left: 10px;
         }
+
         .navbar .btn-primary {
             background-color: #00AEEF;
             border-color: #00AEEF;
         }
+
         .navbar .btn-outline-light {
             color: #fff;
             border-color: #fff;
         }
+
         .navbar .btn-outline-light:hover {
             background-color: #fff;
             color: #00AEEF;
         }
+
         .main-section {
             flex: 1;
             display: flex;
@@ -66,48 +89,61 @@
             text-align: center;
             padding: 20px;
         }
+
         .main-section h1 {
             font-size: 32px;
             color: #fff;
             margin-bottom: 10px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
+
         .main-section p {
             font-size: 18px;
             color: #fff;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
         }
+
         .start-button {
             width: 200px;
             height: 200px;
-            background: #fff;
-            border: 10px solid #F5A623;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+            border: 12px solid #F5A623;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
         }
+
         .start-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
         }
+
         .cloud-icon {
             font-size: 60px;
             color: #00AEEF;
             animation: float 2s ease-in-out infinite;
         }
+
         @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
+
         .drop-zone {
             margin-top: 20px;
-            padding: 20px;
-            border: 2px dashed #fff;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border: 3px dashed #fff;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.15);
             min-height: 100px;
             display: flex;
             align-items: center;
@@ -115,18 +151,23 @@
             flex-direction: column;
             color: #fff;
             text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+            transition: background 0.3s, border-color 0.3s;
         }
+
         .drop-zone.dragover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(245, 166, 35, 0.3);
             border-color: #F5A623;
         }
+
         .drop-zone p {
             margin: 0;
             font-size: 16px;
         }
+
         .drop-zone .or {
             margin: 10px 0;
         }
+
         .drop-zone button {
             background: #fff;
             color: #00AEEF;
@@ -135,44 +176,106 @@
             border-radius: 20px;
             cursor: pointer;
         }
-        .stats {
+
+        .stats-bar {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #fff;
-            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
-        }
-        .actions {
-            margin-top: 30px;
-        }
-        .modal-content {
-            background-color: #fff;
+            align-items: center;
+            width: 100%;
+            background: linear-gradient(to right, #fff3e0, #ffe0b2);
+            padding: 10px 20px;
             border-radius: 10px;
+            margin-top: 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 20px;
+            text-align: center;
+        }
+
+        .stat-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff5722;
+            margin-bottom: 5px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .stat-item .label {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-bar {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            .stat-item {
+                margin: 10px 0;
+            }
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
         .modal-header {
-            background-color: #f0f2f5;
+            background: linear-gradient(135deg, #00AEEF 0%, #0088CC 100%);
+            color: #fff;
+            border-radius: 15px 15px 0 0;
             border-bottom: none;
         }
+
         .modal-footer {
             border-top: none;
         }
+
+        .modal-footer .btn-primary {
+            background: #00AEEF;
+            border: none;
+        }
+
+        .modal-footer .btn-primary:hover {
+            background: #0088CC;
+        }
+
         .file-list {
             margin-top: 10px;
             padding: 10px;
             background: #f8f9fa;
             border-radius: 5px;
         }
+
         .received-files {
             margin-top: 20px;
         }
+
         .received-files h6 {
             margin-bottom: 10px;
         }
+
         .received-files p {
             margin: 5px 0;
         }
+
         .filter-switch {
             border: 2px solid #ffc000;
             border-radius: 30px;
@@ -183,10 +286,14 @@
             width: 400px;
             overflow: hidden;
             margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+
         .filter-switch input {
             display: none;
         }
+
         .filter-switch label {
             flex: 1;
             text-align: center;
@@ -198,8 +305,9 @@
             z-index: 1;
             transition: all 0.5s;
             font-weight: 500;
-            font-size: 18px;
+            font-size: 16px;
         }
+
         .filter-switch .background {
             position: absolute;
             width: 49%;
@@ -209,175 +317,444 @@
             left: 4px;
             border-radius: 30px;
             transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
+
         #option2:checked ~ .background {
             left: 50%;
         }
+
         #option1:checked + label[for="option1"] {
             color: #212121;
             font-weight: bold;
         }
+
         #option2:checked + label[for="option2"] {
             color: #212121;
             font-weight: bold;
         }
+
         #option1:not(:checked) + label[for="option1"],
         #option2:not(:checked) + label[for="option2"] {
             color: #7d7d7d;
         }
+
         .receive-form {
             display: none;
             width: 400px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
             margin-top: 20px;
         }
+
         .receive-form.active {
             display: block;
         }
+
         .receive-form .form-group {
             margin-bottom: 15px;
         }
+
         .receive-form .form-control {
             border: 1px solid #ccc;
             border-radius: 5px;
             padding: 8px;
             width: 100%;
         }
+
         .receive-form .btn {
             width: 100%;
             padding: 10px;
-            background-color: #007bff;
+            background-color: #00AEEF;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background 0.3s;
         }
+
         .receive-form .btn:hover {
-            background-color: #0056b3;
+            background-color: #0088CC;
+        }
+
+        .mode-selection {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .mode-selection select {
+            width: 200px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            color: #333;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-body .form-control {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 8px;
+            width: 100%;
+        }
+
+        .modal-body .form-select {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .history-modal {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 400px;
+            height: 100%;
+            background-color: #fff;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            transition: right 0.3s ease-in-out;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .history-modal.active {
+            right: 0;
+        }
+
+        .history-modal .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .history-table th {
+            background-color: #f0f2f5;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1100;
+        }
+
+        .toast {
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .mode-specific-field {
+            display: none;
+        }
+
+        .mode-specific-field.active {
+            display: block;
+        }
+
+        #receiveModal .modal-header {
+            background: linear-gradient(135deg, #00AEEF 0%, #0088CC 100%);
+            color: #fff;
+            border-radius: 15px 15px 0 0;
+            border-bottom: none;
+        }
+
+        #receiveModal .modal-footer {
+            border-top: none;
+        }
+
+        #receiveModal .modal-footer .btn-primary {
+            background: #00AEEF;
+            border: none;
+        }
+
+        #receiveModal .modal-footer .btn-primary:hover {
+            background: #0088CC;
+        }
+
+        .uploader_done_img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .uploader_done_img img {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
-<body>
-    <div class="content">
-        <nav class="navbar navbar-expand-lg">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">TransferNow</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="#">Khám phá</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Ưu đãi và giá cả</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Ứng dụng</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Nhà phát triển</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#">Tài nguyên</a></li>
-                    </ul>
-                    <div class="d-flex align-center" style="align-items: center">
-                        {% if not username %}
-                            <button class="btn btn-primary sign-in" onclick="window.location.href='/login'">Đăng nhập</button>
-                            <button class="btn btn-outline-light" onclick="window.location.href='/register'">Đăng ký</button>
-                        {% else %}
-                            <span class="nav-link text-white">Chào mừng, {{ username }}!</span>
-                            <button class="btn btn-outline-light" onclick="window.location.href='/logout'">Đăng xuất</button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </nav>
-        <div class="main-section">
-            <h1>Chuyển và để file của bạn du hành miễn phí</h1>
-            <p>TransferNow là cách đơn giản và miễn phí để chia sẻ file và thư mục một cách an toàn.</p>
-            <div class="start-button">
-                <i class="fas fa-cloud cloud-icon"></i>
-            </div>
-            <div class="drop-zone" id="dropZone">
-                <p>Nhấp hoặc kéo thả file vào đây</p>
-                <div class="or">HOẶC</div>
-                <button>Duyệt file</button>
-            </div>
-            <div class="receive-form" id="receiveForm">
-                <div class="form-group">
-                    <input type="email" class="form-control" id="receiverEmail" placeholder="Địa chỉ email của bạn" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" id="receiverUsername" placeholder="Tên đăng nhập của bạn" readonly value="{{ username }}" required>
-                </div>
-                <div class="form-group">
-                    <input type="text" class="form-control" id="senderUsernameReceive" placeholder="Tên đăng nhập người gửi" required>
-                </div>
-                <button class="btn" id="fetchFilesButton">Lấy file</button>
-                <div class="received-files" id="receivedFiles">
-                    <!-- Danh sách file đã nhận sẽ được điền động -->
-                </div>
-            </div>
-            <div class="stats">
-                <span>2,250,831,405 file đã tải xuống</span>
-                <span>752,358,181 file đã gửi</span>
-                <span>66,906,515 GB đã được gửi vào quỹ đạo</span>
-                <span>4.8 ★★★★★ (635,122 lượt bình chọn)</span>
-            </div>
-            <div id="firstFilter" class="filter-switch">
-                <input checked="" id="option1" name="options" type="radio" />
-                <label class="option" for="option1">Gửi</label>
-                <input id="option2" name="options" type="radio" />
-                <label class="option" for="option2">Nhận</label>
-                <span class="background"></span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Send Modal -->
-    <div class="modal fade" id="sendModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="sendModalLabel">Gửi file</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="senderEmail" class="form-label">Địa chỉ email của bạn</label>
-                        <input type="email" class="form-control" id="senderEmail" placeholder="your.email@example.com" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="senderUsername" class="form-label">Tên đăng nhập của bạn</label>
-                        <input type="text" class="form-control" id="senderUsername" placeholder="Tên đăng nhập" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="recipientUsername" class="form-label">Tên đăng nhập người nhận</label>
-                        <input type="text" class="form-control" id="recipientUsername" placeholder="recipient_username" list="userList">
-                        <datalist id="userList">
-                            <!-- Danh sách người dùng sẽ được điền động -->
-                        </datalist>
-                    </div>
-                    <div class="mb-3">
-                        <label for="subject" class="form-label">Tiêu đề (tùy chọn)</label>
-                        <input type="text" class="form-control" id="subject" placeholder="Tiêu đề">
-                    </div>
-                    <div class="mb-3">
-                        <label for="message" class="form-label">Tin nhắn của bạn (tùy chọn)</label>
-                        <textarea class="form-control" id="message" rows="3" placeholder="Thêm tin nhắn"></textarea>
-                    </div>
-                    <div class="file-list" id="fileList">
-                        <!-- Danh sách file sẽ được điền động -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="button" class="btn btn-primary" id="transferButton">Chuyển</button>
+<body class="send-mode">
+<div class="content">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">TransferNow</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Chuyển đổi điều hướng">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#">Khám Phá</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Ưu Đãi & Giá Cả</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Ứng Dụng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="historyLink">Lịch Sử</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Tài Nguyên</a></li>
+                </ul>
+                <div class="d-flex align-center" style="align-items: center">
+                    {% if not username %}
+                        <button class="btn btn-primary sign-in" onclick="window.location.href='/login'">Đăng Nhập
+                        </button>
+                        <button class="btn btn-outline-light" onclick="window.location.href='/register'">Đăng Ký
+                        </button>
+                    {% else %}
+                        <span class="nav-link text-white">Xin chào, {{ username }}!</span>
+                        <button class="btn btn-outline-light" onclick="window.location.href='/logout'">Đăng Xuất
+                        </button>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </nav>
+    <div class="main-section">
+        <h1>Chuyển và nhận file của bạn một cách an toàn, miễn phí</h1>
+        <p>TransferNow cung cấp giải pháp đơn giản và bảo mật để chia sẻ file và thư mục.</p>
+        <div class="start-button">
+            <i class="fas fa-cloud cloud-icon"></i>
+        </div>
+        <div class="mode-selection">
+            <label for="mode">Chọn chế độ:</label>
+            <select id="mode" class="form-select">
+                <option value="Local">Cục bộ</option>
+                <option value="Cloud">Đám mây</option>
+            </select>
+        </div>
+        <div class="drop-zone" id="dropZone">
+            <p>Nhấp hoặc kéo thả file vào đây</p>
+            <div class="or">HOẶC</div>
+            <button>Chọn File</button>
+        </div>
+        <div class="receive-form" id="receiveForm">
+            <div class="form-group">
+                <label for="myReceiverEmail">Email của bạn</label>
+                <input type="email" class="form-control" id="myReceiverEmail" placeholder="Nhập email của bạn"
+                       value="{{ email }}" readonly required>
+            </div>
+            <div class="form-group">
+                <label for="receiverUsername">Tên đăng nhập của bạn</label>
+                <input type="text" class="form-control" id="receiverUsername" placeholder="Nhập tên đăng nhập"
+                       value="{{ username }}" readonly required>
+            </div>
+            <div class="form-group">
+                <label for="senderEmailReceive">Email người gửi</label>
+                <input type="email" class="form-control" id="senderEmailReceive" placeholder="Nhập email người gửi"
+                       required>
+            </div>
+            <div class="form-group mode-specific-field" id="fileIdContainer">
+                <label for="fileIdReceive">Mã File (dành cho chế độ Đám mây)</label>
+                <input type="text" class="form-control" id="fileIdReceive" placeholder="Nhập mã file từ đám mây"
+                       required>
+            </div>
+            <button class="btn" id="fetchFilesButton">Tải File</button>
+            <div class="received-files" id="receivedFiles">
+                <!-- Danh sách file đã nhận sẽ được điền động -->
+            </div>
+        </div>
+        <div class="stats-bar">
+            <span class="stat-item">
+                <span class="value" id="downloads">0</span>
+                <span class="label">downloaded files</span>
+            </span>
+            <span class="stat-item">
+                <span class="value" id="uploads">0</span>
+                <span class="label">sent files</span>
+            </span>
+            <span class="stat-item">
+                <span class="value" id="storage">0</span>
+                <span class="label">sent into orbit</span>
+            </span>
+            <span class="stat-item">
+                <span class="value" id="rating">0</span>
+                <span class="label">average user rating</span>
+            </span>
+        </div>
+        <div id="firstFilter" class="filter-switch">
+            <input checked="" id="option1" name="options" type="radio"/>
+            <label class="option" for="option1">Gửi File</label>
+            <input id="option2" name="options" type="radio"/>
+            <label class="option" for="option2">Nhận File</label>
+            <span class="background"></span>
+        </div>
     </div>
+</div>
 
+<!-- Send Modal -->
+<div class="modal fade" id="sendModal" tabindex="-1" aria-labelledby="sendModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendModalLabel">Gửi File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="senderEmail" class="form-label">Email của bạn</label>
+                    <input type="email" class="form-control" id="senderEmail" placeholder="Nhập email của bạn"
+                           readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="senderName" class="form-label">Tên người gửi (không bắt buộc)</label>
+                    <input type="text" class="form-control" id="senderName" placeholder="Nhập tên của bạn">
+                </div>
+                <div class="mb-3">
+                    <label for="recipientEmail" class="form-label">Email người nhận</label>
+                    <input type="email" class="form-control" id="recipientEmail" placeholder="Nhập email người nhận"
+                           required>
+                </div>
+                <div class="mb-3 mode-specific-field" id="receiverIpField">
+                    <label for="receiverIp" class="form-label">IP người nhận (dành cho chế độ Cục bộ)</label>
+                    <input type="text" class="form-control" id="receiverIp" placeholder="Ví dụ: 192.168.1.1">
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Tiêu đề (không bắt buộc)</label>
+                    <input type="text" class="form-control" id="subject" placeholder="Nhập tiêu đề">
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Tin nhắn (không bắt buộc)</label>
+                    <textarea class="form-control" id="message" rows="3" placeholder="Nhập tin nhắn của bạn"></textarea>
+                </div>
+                <div class="file-list" id="fileList">
+                    <!-- Danh sách file sẽ được điền động -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="transferButton">Gửi File</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Bootstrap JS and Popper.js -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
+<!-- Receive Modal -->
+<div class="modal fade" id="receiveModal" tabindex="-1" aria-labelledby="receiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="receiveModalLabel">File Đã Nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <p><strong>Tên file:</strong> <span id="modalFilename">Không xác định</span></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Email người gửi:</strong> <span id="modalSenderEmail">Không xác định</span></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Thời gian gửi/nhận:</strong> <span id="modalTimestamp">Không xác định</span></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Mã File:</strong> <span id="modalFileId">Không xác định</span></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Đường dẫn Drive:</strong> <span id="modalDriveLink">Không có đường dẫn</span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="downloadButton">Tải xuống</button>
+                <button type="button" class="btn btn-primary" id="previewButton">Xem trước</button>
+                <button type="button" class="btn btn-primary" id="copyButton">Sao chép</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Success Modal -->
+<div class="modal fade" id="sendSuccessModal" tabindex="-1" aria-labelledby="sendSuccessModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #218838 100%); color: #fff; border-radius: 15px 15px 0 0; border-bottom: none;">
+                <h5 class="modal-title" id="sendSuccessModalLabel">Gửi File Thành Công</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="uploader_done_img">
+                    <img src="https://assets.transfernow.net/29176640/icons/uploader/png/transfer-done.png" alt="Transfer Success" width="200" height="120" style="margin-bottom: 20px;">
+                </div>
+                <div class="form-group">
+                    <p><strong>Trạng thái:</strong> <span id="sendSuccessStatus">Thành công</span></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Mã File:</strong> <span id="sendSuccessFileId">Không xác định</span> <button id="copyFileIdButton" class="btn btn-sm btn-primary">Copy</button></p>
+                </div>
+                <div class="form-group">
+                    <p><strong>Email người nhận:</strong> <span id="sendSuccessRecipient">Không xác định</span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div class="history-modal" id="historyModal">
+    <span class="close-btn" id="closeHistory">×</span>
+    <h5>Lịch sử giao dịch</h5>
+    <table class="history-table" id="history-table">
+        <thead>
+        <tr>
+            <th>Người gửi</th>
+            <th>Người nhận</th>
+            <th>File</th>
+            <th>Thời gian</th>
+            <th>Trạng thái</th>
+            <th>Link Cloud</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">Thông báo</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         const dropZone = document.getElementById('dropZone');
         const startButton = document.querySelector('.start-button');
@@ -385,62 +762,134 @@
         const fileList = document.getElementById('fileList');
         const sendModal = new bootstrap.Modal(document.getElementById('sendModal'));
         const senderEmail = document.getElementById('senderEmail');
-        const senderUsername = document.getElementById('senderUsername');
-        const recipientUsername = document.getElementById('recipientUsername');
-        const userList = document.getElementById('userList');
-        const receiverEmail = document.getElementById('receiverEmail');
+        const senderName = document.getElementById('senderName');
+        const modalRecipientEmail = document.getElementById('recipientEmail');
+        const myReceiverEmail = document.getElementById('myReceiverEmail');
         const receiverUsernameForm = document.getElementById('receiverUsername');
-        const senderUsernameReceive = document.getElementById('senderUsernameReceive');
+        const senderEmailReceive = document.getElementById('senderEmailReceive');
         const receivedFiles = document.getElementById('receivedFiles');
+        const modeSelect = document.getElementById('mode');
+        const receiverIp = document.getElementById('receiverIp');
+        const receiverIpField = document.getElementById('receiverIpField');
+        const historyLink = document.getElementById('historyLink');
+        const historyModal = document.getElementById('historyModal');
+        const closeHistory = document.getElementById('closeHistory');
+        const receiveModal = new bootstrap.Modal(document.getElementById('receiveModal'));
+        const transferButton = document.getElementById('transferButton');
         let selectedFiles = [];
 
-        // Kiểm tra trạng thái đăng nhập với xác thực từ server
-        async function checkLogin() {
-            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-            if (!token) return false;
+        function initCounters() {
+            console.log('Initializing counters...');
+            const statsData = [
+                {
+                    el: document.getElementById('downloads'),
+                    start: 0,
+                    end: 2347923248,
+                    suffix: '',
+                    label: 'downloaded files'
+                },
+                {el: document.getElementById('uploads'), start: 0, end: 780820765, suffix: '', label: 'sent files'},
+                {
+                    el: document.getElementById('storage'),
+                    start: 0,
+                    end: 68057526,
+                    suffix: ' GB',
+                    label: 'sent into orbit'
+                },
+                {
+                    el: document.getElementById('rating'),
+                    start: 0,
+                    end: 4.8,
+                    suffix: ' ★★★★★ (642438 votes)',
+                    label: 'average user rating'
+                }
+            ];
 
+            statsData.forEach(data => {
+                if (!data.el) {
+                    console.error(`Element with ID ${data.el.id} not found!`);
+                    return;
+                }
+                anime({
+                    targets: data.el,
+                    innerHTML: [data.start, data.end],
+                    round: 1,
+                    easing: 'linear',
+                    duration: 2000,
+                    complete: function (anim) {
+                        setInterval(() => {
+                            const currentValue = parseInt(data.el.innerHTML) || data.start;
+                            anime({
+                                targets: data.el,
+                                innerHTML: [currentValue, data.end + Math.floor(Math.random() * 1000)],
+                                round: 1,
+                                easing: 'linear',
+                                duration: 2000
+                            }).play();
+                        }, 2000);
+                    }
+                }).play();
+            });
+        }
+
+        initCounters();
+
+        async function getSenderInfo() {
+            const cached = localStorage.getItem('sender_info');
+            if (cached) return JSON.parse(cached);
+            const response = await fetch('/get_sender_info', {credentials: 'include'});
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('sender_info', JSON.stringify(data));
+                return data;
+            }
+            throw new Error('Failed to fetch sender info');
+        }
+
+        async function checkLogin() {
             try {
-                const response = await fetch('/get_sender_info', {
-                    method: 'GET',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                return response.ok; // True nếu trạng thái là 200
+                const data = await getSenderInfo();
+                return !!data.username;
             } catch (error) {
                 console.error('Kiểm tra đăng nhập thất bại:', error);
                 return false;
             }
         }
 
-        // Cài đặt modal gửi
         sendModal._element.addEventListener('show.bs.modal', async () => {
             if (!(await checkLogin())) {
-                alert('Vui lòng đăng nhập lại.');
+                showToast('Vui lòng đăng nhập lại.', 'danger');
                 window.location.href = '/login';
                 sendModal.hide();
                 return;
             }
-            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-            if (token) {
-                try {
-                    const response = await fetch('/get_sender_info', {
-                        method: 'GET',
-                        headers: { 'Authorization': `Bearer ${token}` }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        senderEmail.value = data.email || '';
-                        senderUsername.value = data.username || '';
-                        userList.innerHTML = (data.users || []).map(user => `<option value="${user}">`).join('');
-                    } else {
-                        alert('Không thể tải thông tin người gửi. Vui lòng đăng nhập lại.');
-                        window.location.href = '/login';
-                    }
-                } catch (error) {
-                    console.error('Lỗi khi lấy thông tin người gửi:', error);
-                    alert('Lỗi mạng. Vui lòng thử lại.');
-                }
-            }
+            const data = await getSenderInfo();
+            senderEmail.value = data.email || '';
+            senderName.value = data.username || '';
+            modalRecipientEmail.value = '';
+            receiverIp.value = '';
+            updateModeFields();
         });
+
+        function updateModeFields() {
+            const fileIdContainer = document.getElementById('fileIdContainer');
+            const receiverIpField = document.getElementById('receiverIpField');
+
+            if (!fileIdContainer || !receiverIpField) {
+                console.error('Element not found:', {fileIdContainer, receiverIpField});
+                return;
+            }
+
+            if (modeSelect.value === 'Cloud') {
+                fileIdContainer.style.display = 'block';
+                receiverIpField.classList.remove('active');
+            } else { // Local
+                fileIdContainer.style.display = 'none';
+                receiverIpField.classList.add('active');
+            }
+        }
+
+        modeSelect.addEventListener('change', updateModeFields);
 
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -481,92 +930,273 @@
             fileList.innerHTML = '<h6>Danh sách file:</h6>' + selectedFiles.map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>`).join('');
         }
 
-        document.getElementById('transferButton').addEventListener('click', async () => {
+        transferButton.addEventListener('click', async () => {
             if (!(await checkLogin())) {
-                alert('Vui lòng đăng nhập lại.');
+                showToast('Vui lòng đăng nhập lại.', 'danger');
                 window.location.href = '/login';
                 return;
             }
-            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
-            if (token && selectedFiles.length > 0 && recipientUsername.value) {
-                const formData = new FormData();
-                selectedFiles.forEach(file => formData.append('files', file));
-                formData.append('mode', 'Local');
-                formData.append('action', 'send');
-                formData.append('receiver_username', recipientUsername.value);
-                formData.append('sender_email', senderEmail.value);
-                formData.append('sender_username', senderUsername.value);
-                formData.append('subject', document.getElementById('subject').value);
-                formData.append('message', document.getElementById('message').value);
 
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/transfer', true);
-                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        alert('Chuyển file thành công!');
-                        sendModal.hide();
-                        selectedFiles = [];
-                        fileList.innerHTML = '';
-                    } else if (xhr.status === 401) {
-                        alert('Vui lòng đăng nhập lại.');
-                        window.location.href = '/login';
-                    } else {
-                        alert('Đã xảy ra lỗi: ' + xhr.responseText);
+            if (selectedFiles.length === 0 || !modalRecipientEmail.value.trim()) {
+                showToast('Vui lòng chọn file và nhập email người nhận.', 'warning');
+                return;
+            }
+
+            // Thêm hiệu ứng loading
+            transferButton.disabled = true;
+            transferButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang gửi...';
+
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+            formData.append('mode', modeSelect.value);
+            formData.append('action', 'send');
+            formData.append('receiver_email', modalRecipientEmail.value.trim());
+            formData.append('subject', document.getElementById('subject').value || '');
+            formData.append('message', document.getElementById('message').value || '');
+            if (modeSelect.value === 'Local' && !receiverIp.value.trim()) {
+                showToast('Vui lòng nhập địa chỉ IP người nhận cho chế độ Cục bộ.', 'warning');
+                transferButton.disabled = false;
+                transferButton.innerHTML = 'Gửi File';
+                return;
+            }
+            formData.append('receiver_ip', receiverIp.value || '');
+
+            try {
+                const response = await fetch('/transfer', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.file_id) {
+                        const sendSuccessModal = new bootstrap.Modal(document.getElementById('sendSuccessModal'));
+                        document.getElementById('sendSuccessStatus').textContent = 'Thành công';
+                        document.getElementById('sendSuccessFileId').textContent = data.file_id || 'Không xác định';
+                        document.getElementById('sendSuccessRecipient').textContent = modalRecipientEmail.value.trim();
+                        sendSuccessModal.show();
                     }
-                };
-                xhr.onerror = () => {
-                    alert('Lỗi mạng. Vui lòng thử lại.');
-                };
-                xhr.send(formData);
-            } else {
-                alert('Vui lòng chọn file và cung cấp tên người nhận.');
+                    if (data.status_log) {
+                        console.log('Server logs:', data.status_log);
+                        data.status_log.forEach(log => showToast(log, 'info'));
+                    }
+                    sendModal.hide();
+                    document.querySelector('.start-button').focus();
+                    selectedFiles = [];
+                    fileList.innerHTML = '';
+                } else if (response.status === 401) {
+                    showToast('Vui lòng đăng nhập lại.', 'danger');
+                    window.location.href = '/login';
+                } else {
+                    showToast('Đã xảy ra lỗi: ' + (data.message || 'Không xác định'), 'danger');
+                }
+            } catch (error) {
+                console.error('Lỗi khi gửi file:', error);
+                showToast('Lỗi mạng. Vui lòng thử lại.', 'danger');
+            } finally {
+                // Khôi phục nút sau khi hoàn tất
+                transferButton.disabled = false;
+                transferButton.innerHTML = 'Gửi File';
             }
         });
 
-        // Lấy file đã nhận
         document.getElementById('fetchFilesButton').addEventListener('click', async () => {
             if (!(await checkLogin())) {
-                alert('Vui lòng đăng nhập lại.');
+                showToast('Vui lòng đăng nhập lại.', 'danger');
                 window.location.href = '/login';
                 return;
             }
-            const token = document.cookie.replace(/(?:(?:^|.*;\s*)Authorization\s*=\s*([^;]*).*$)|^.*$/, "$1");
 
-            if (receiverEmail.value && receiverUsernameForm.value && senderUsernameReceive.value) {
-                try {
-                    const response = await fetch('/get_received_files', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            receiver_email: receiverEmail.value,
-                            receiver_username: receiverUsernameForm.value,
-                            sender_username: senderUsernameReceive.value
-                        })
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        receivedFiles.innerHTML = '<h6>File đã nhận:</h6>' + (data.files || []).map(file => `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB) - Gửi lúc: ${file.sent_at} <a href="/download?file=${encodeURIComponent(file.path)}" class="btn btn-sm btn-primary" download="${file.name}">Tải về</a></p>`).join('');
-                    } else if (response.status === 401) {
-                        alert('Phiên làm việc hết hạn. Vui lòng đăng nhập lại.');
-                        window.location.href = '/login';
+            if (!myReceiverEmail.value) {
+                showToast('Vui lòng điền email của bạn.', 'warning');
+                return;
+            }
+
+            const fileIdContainer = document.getElementById('fileIdContainer');
+            const fileIdValue = document.getElementById('fileIdReceive').value.trim();
+
+            if (modeSelect.value === 'Cloud' && !fileIdValue) {
+                showToast('Vui lòng nhập Mã File cho chế độ Đám mây.', 'warning');
+                return;
+            }
+
+            if (modeSelect.value === 'Cloud' && !/^[a-zA-Z0-9_-]{10,}$/.test(fileIdValue)) {
+                showToast('File ID không hợp lệ. Vui lòng kiểm tra lại.', 'warning');
+                return;
+            }
+
+            try {
+                const endpoint = modeSelect.value === 'Cloud' ? '/receive_cloud' : '/get_received_files';
+                const body = {
+                    file_id: modeSelect.value === 'Cloud' ? fileIdValue : undefined,
+                    receiver_email: modeSelect.value === 'Local' ? myReceiverEmail.value.trim() : undefined,
+                    sender_username: modeSelect.value === 'Local' ? senderEmailReceive.value.trim() : undefined,
+                    sender_email: modeSelect.value === 'Cloud' ? senderEmailReceive.value.trim() : undefined
+                };
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(body),
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                console.log('Response data:', data); // Debug
+                if (response.ok) {
+                    if (modeSelect.value === 'Cloud' && data.success) {
+                        // Cập nhật nội dung modal
+                        document.getElementById('modalFilename').textContent = data.filename || 'Không xác định';
+                        document.getElementById('modalSenderEmail').textContent = data.sender_email || 'Không xác định';
+                        document.getElementById('modalTimestamp').textContent = data.timestamp || 'Không xác định';
+                        document.getElementById('modalFileId').textContent = data.file_id || 'Không xác định';
+
+                        // Hiển thị và thu gọn cloud_link
+                        const cloudLink = data.cloud_link || 'Không có đường dẫn';
+                        const maxLength = 50;
+                        const displayLink = cloudLink.length > maxLength ? cloudLink.substring(0, maxLength) + '...' : cloudLink;
+                        document.getElementById('modalDriveLink').innerHTML = `<span title="${cloudLink}">${displayLink}</span> <button id="copyLinkButton" class="btn btn-sm btn-primary">Copy</button>`;
+
+                        // Thêm sự kiện cho nút Copy
+                        document.getElementById('copyLinkButton').addEventListener('click', () => {
+                            navigator.clipboard.writeText(cloudLink).then(() => {
+                                showToast('Liên kết đã được sao chép!', 'success');
+                            }).catch(err => {
+                                showToast('Không thể sao chép liên kết.', 'danger');
+                            });
+                        });
+
+                        // Cập nhật nút Tải xuống
+                        const downloadButton = document.getElementById('downloadButton');
+                        downloadButton.onclick = async () => {
+                            const downloadUrl = `/download_decrypted?filename=${encodeURIComponent(data.filename)}&email=${encodeURIComponent(myReceiverEmail.value)}`;
+                            const response = await fetch(downloadUrl, {credentials: 'include'});
+                            if (response.ok) {
+                                const blob = await response.blob();
+                                const url = window.URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = data.filename;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(url);
+                                showToast('Tải xuống thành công!', 'success');
+                            } else {
+                                showToast('Lỗi khi tải xuống.', 'danger');
+                            }
+                        };
+
+                        // Cập nhật nút Xem trước
+                        const previewButton = document.getElementById('previewButton');
+                        previewButton.onclick = async () => {
+                            const previewUrl = `/preview_decrypted?filename=${encodeURIComponent(data.filename)}&email=${encodeURIComponent(myReceiverEmail.value)}`;
+                            const response = await fetch(previewUrl, {credentials: 'include'});
+                            if (response.ok) {
+                                const text = await response.text();
+                                const newWindow = window.open('', '_blank');
+                                newWindow.document.write(`
+                            <html><body><pre>${text}</pre></body></html>
+                        `);
+                                newWindow.document.close();
+                            } else {
+                                showToast('Lỗi khi xem trước.', 'danger');
+                            }
+                        };
+
+                        senderEmailReceive.value = data.sender_email || senderEmailReceive.value;
+                        receiveModal.show();
+                    } else if (data.files && data.files.length > 0) {
+                        receivedFiles.innerHTML = '<h6>File đã nhận:</h6>' + data.files.map(file => {
+                            const expired = new Date() > new Date(file.sent_at + 'Z');
+                            return `<p>${file.name} (${(file.size / 1024).toFixed(2)} KB) - Gửi lúc: ${file.sent_at} ${expired ? '(Hết hạn)' : ''} <a href="${file.download_url}" class="btn btn-sm btn-primary" download="${file.name}">Tải về</a></p>`;
+                        }).join('');
+                        if (data.status_log) console.log('Status log:', data.status_log);
                     } else {
-                        alert('Lỗi khi lấy file: ' + await response.text());
+                        receivedFiles.innerHTML = '<h6>File đã nhận:</h6><p>Chưa có file nào.</p>';
+                        if (data.status_log && data.status_log.some(log => log.includes('expired'))) {
+                            showToast('Không có file nào khả dụng, một số file đã hết hạn.', 'warning');
+                        }
                     }
-                } catch (error) {
-                    console.error('Lỗi khi lấy file:', error);
-                    alert('Lỗi mạng. Vui lòng thử lại.');
+                } else if (response.status === 401) {
+                    showToast('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', 'danger');
+                    window.location.href = '/login';
+                } else {
+                    receivedFiles.innerHTML = `<h6>File đã nhận:</h6><p>Lỗi: ${data.message || 'Không xác định'}</p>`;
+                    showToast(`Lỗi khi tải file: ${data.message || 'Không xác định'}`, 'danger');
                 }
-            } else {
-                alert('Vui lòng điền đầy đủ các trường.');
+            } catch (error) {
+                console.error('Lỗi khi tải file:', error);
+                receivedFiles.innerHTML = '<h6>File đã nhận:</h6><p>Lỗi mạng. Vui lòng thử lại.</p>';
+                showToast('Lỗi mạng. Vui lòng thử lại.', 'danger');
             }
         });
 
-        // Chuyển đổi nội dung dựa trên bộ lọc
+        document.getElementById('copyButton').addEventListener('click', () => {
+            const text = `Tên file: ${document.getElementById('modalFilename').textContent}\n` +
+                `Email người gửi: ${document.getElementById('modalSenderEmail').textContent}\n` +
+                `Thời gian gửi/nhận: ${document.getElementById('modalTimestamp').textContent}\n` +
+                `Mã File: ${document.getElementById('modalFileId').textContent}\n` +
+                `Đường dẫn Drive: ${document.getElementById('modalDriveLink').textContent}`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Thông tin đã được sao chép!', 'success');
+            }).catch(err => {
+                console.error('Lỗi khi sao chép:', err);
+                showToast('Không thể sao chép thông tin.', 'danger');
+            });
+        });
+
+        async function refreshHistory() {
+            try {
+                const response = await fetch('/history', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const historyTable = document.getElementById('history-table').getElementsByTagName('tbody')[0];
+                    historyTable.innerHTML = data.history.map(log => `
+                    <tr>
+                        <td>${log.sender}</td>
+                        <td>${log.receiver}</td>
+                        <td>${log.file}</td>
+                        <td>${log.timestamp}</td>
+                        <td>${log.status}</td>
+                        <td>${log.cloud_link ? `<a href="${log.cloud_link}" target="_blank">Link</a>` : ''}</td>
+                    </tr>
+                `).join('');
+                    console.log('History updated:', data.history);
+                } else {
+                    console.error('Error fetching history:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error refreshing history:', error);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('liveToast');
+            const toastBody = toast.querySelector('.toast-body');
+            toastBody.textContent = message;
+            toast.className = 'toast';
+            switch (type) {
+                case 'success':
+                    toast.classList.add('text-bg-success');
+                    break;
+                case 'danger':
+                    toast.classList.add('text-bg-danger');
+                    break;
+                case 'warning':
+                    toast.classList.add('text-bg-warning');
+                    break;
+                default:
+                    toast.classList.add('text-bg-info');
+            }
+            new bootstrap.Toast(toast).show();
+        }
+
         document.getElementById('option1').addEventListener('change', () => {
+            document.body.className = 'send-mode';
             startButton.style.display = 'flex';
             dropZone.style.display = 'flex';
             receiveForm.classList.remove('active');
@@ -576,9 +1206,41 @@
         });
 
         document.getElementById('option2').addEventListener('change', () => {
+            document.body.className = 'receive-mode';
             startButton.style.display = 'none';
             dropZone.style.display = 'none';
             receiveForm.classList.add('active');
+        });
+
+        historyLink.addEventListener('click', async () => {
+            if (!(await checkLogin())) {
+                showToast('Vui lòng đăng nhập lại.', 'danger');
+                window.location.href = '/login';
+                return;
+            }
+            historyModal.classList.add('active');
+            refreshHistory();
+        });
+
+        closeHistory.addEventListener('click', () => {
+            historyModal.classList.remove('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!historyModal.contains(e.target) && e.target !== historyLink) {
+                historyModal.classList.remove('active');
+            }
+        });
+
+        // Thêm sự kiện cho nút Copy File ID
+        document.getElementById('copyFileIdButton').addEventListener('click', () => {
+            const fileId = document.getElementById('sendSuccessFileId').textContent;
+            navigator.clipboard.writeText(fileId).then(() => {
+                showToast('Mã File đã được sao chép!', 'success');
+            }).catch(err => {
+                console.error('Lỗi khi sao chép:', err);
+                showToast('Không thể sao chép mã File.', 'danger');
+            });
         });
     });
 </script>
